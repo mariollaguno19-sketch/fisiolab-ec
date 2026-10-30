@@ -23,6 +23,20 @@ const CONFIG = {
     facebook: "https://www.facebook.com/fisiolab.ec",
     tiktok: "https://www.tiktok.com/@fisiolab.ec"
   },
+  // Fondos de video / imagen. Dejar en "" hasta tener el material.
+  // video: .mp4 1920x1080, 10-15 s, sin audio, < 4 MB. poster/image: .jpg 1920 px de ancho.
+  media: {
+    hero:           { video: "", poster: "" },   // {{VIDEO_HERO}} recorrido por el centro
+    robotica:       { video: "", poster: "" },   // {{VIDEO_ROBOTICA}} equipos en uso
+    cta:            { image: "" },               // {{FOTO_CTA}} recepción o fachada
+    home:           { image: "" },               // {{FOTO_HOME}} atención a domicilio
+    especialidades: { image: "" },               // {{FOTO_ESPECIALIDADES}}
+    terapias:       { image: "" },               // {{FOTO_TERAPIAS}}
+    servicios:      { image: "" },               // {{FOTO_SERVICIOS}}
+    equipo:         { image: "" },               // {{FOTO_EQUIPO_GRUPAL}}
+    ubicacion:      { image: "" },               // {{FOTO_FACHADA}}
+    profesionales:  { image: "" }                // {{FOTO_EDUSALUD}}
+  },
   // Servicio → número y mensaje. El mensaje nunca pide datos de salud.
   services: {
     general:            { label: "Cita general", n: "waMain" },
@@ -254,6 +268,29 @@ const ANALYTICS = { ga4: "", metaPixel: "" }; // {{GA4_ID}} {{PIXEL_ID}} — se 
       if (scrollY / (d.body.scrollHeight - innerHeight) > .55) { showToast(); removeEventListener("scroll", h); }
     }, { passive: true });
   }
+
+  /* ---------- Fondos de video / imagen ---------- */
+  const saveData = navigator.connection && navigator.connection.saveData;
+  d.querySelectorAll("[data-media]").forEach(box => {
+    const m = CONFIG.media[box.dataset.media];
+    if (!m || !(m.video || m.image || m.poster)) return;
+    box.classList.add("has-media");
+    const ready = () => box.classList.add("is-ready");
+    if (m.video && !reduce && !saveData && innerWidth >= 760) {
+      const v = d.createElement("video");
+      Object.assign(v, { muted: true, loop: true, playsInline: true, autoplay: true, preload: "none" });
+      v.setAttribute("muted", ""); v.setAttribute("playsinline", "");
+      if (m.poster) v.poster = m.poster;
+      v.addEventListener("loadeddata", ready, { once: true });
+      // el video se pide después de la carga para no competir con el contenido
+      addEventListener("load", () => { v.src = m.video; v.play().catch(() => {}); }, { once: true });
+      if (d.readyState === "complete") { v.src = m.video; v.play().catch(() => {}); }
+      box.appendChild(v);
+    } else if (m.image || m.poster) {
+      const i = new Image(); i.alt = ""; i.loading = box.closest(".hero") ? "eager" : "lazy"; i.decoding = "async";
+      i.onload = ready; i.src = m.image || m.poster; box.appendChild(i);
+    }
+  });
 
   /* ---------- Año ---------- */
   d.querySelectorAll("[data-year]").forEach(e => e.textContent = new Date().getFullYear());

@@ -182,7 +182,7 @@ button { font: inherit; color: inherit; }
 .hero__rings { position: absolute; right: -20vw; top: -10vw; width: 80vw; max-width: 980px; pointer-events: none; opacity: .5; }
 .hero__rings circle { fill: none; stroke: rgba(255,255,255,.14); stroke-width: 1; }
 
-.finder { align-self: end; background: var(--on-brand); color: var(--ink); border-radius: var(--r-l); padding: 1.5rem; box-shadow: 0 30px 60px -30px oklch(0.2 0.08 252 / .55); }
+.finder { align-self: start; background: var(--on-brand); color: var(--ink); border-radius: var(--r-l); padding: 1.5rem; box-shadow: 0 30px 60px -30px oklch(0.2 0.08 252 / .55); }
 .finder h2 { font-family: var(--f-serif); font-size: var(--t-l); letter-spacing: -.02em; line-height: 1.15; }
 .finder p { font-size: var(--t-s); color: var(--ink-2); margin: .35rem 0 1.1rem; }
 .finder__opts { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
@@ -202,8 +202,8 @@ button { font: inherit; color: inherit; }
   .proof li + li { border-left: 1px solid rgba(255,255,255,.12); padding-left: 1.5rem; }
 }
 @media (min-width: 1000px) {
-  .hero__grid { grid-template-columns: 1.35fr .9fr; gap: 5rem; align-items: end; }
-  .finder { padding: 1.75rem; }
+  .hero__grid { grid-template-columns: 1.35fr .9fr; gap: 5rem; align-items: start; }
+  .finder { padding: 1.75rem; margin-top: 1.5rem; }
 }
 @keyframes h1-in { from { transform: translateY(.35em); filter: blur(10px); } to { transform: none; filter: none; } }
 @keyframes breathe { from { rotate: 0deg; } to { rotate: -5deg; } }
@@ -496,3 +496,59 @@ button { font: inherit; color: inherit; }
 .team > *, .dir > *, .gallery > *, .split > *, .hero__grid > *, .pkgs > *, .tech > * { min-width: 0; }
 
 .route--v { margin-top: 2.5rem; }
+
+/* ================================================================
+   Fondos y texturas
+   - Degradado con luz suave + líneas de columna (6 columnas alineadas al contenedor)
+   - Grano fino en una capa fija (no repinta al hacer scroll)
+   - .bg-media: espacio para video o imagen de fondo (se llena desde CONFIG.media)
+   ================================================================ */
+:root {
+  --cols: min(var(--max), 100vw);
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+body::after { content: ""; position: fixed; inset: 0; z-index: calc(var(--z-loader) + 1); pointer-events: none; background: var(--grain); opacity: .045; }
+
+.hero, .page-hero, .cta { background:
+  radial-gradient(70% 90% at 88% -10%, oklch(0.66 0.11 245 / .55), transparent 60%),
+  radial-gradient(60% 70% at 0% 110%, oklch(0.42 0.11 255 / .5), transparent 65%),
+  linear-gradient(170deg, oklch(0.56 0.12 249), oklch(0.47 0.115 253)); }
+.sec--deep { position: relative; isolation: isolate; background:
+  radial-gradient(60% 80% at 92% 0%, oklch(0.4 0.1 252 / .7), transparent 60%),
+  linear-gradient(180deg, oklch(0.23 0.05 254), oklch(0.27 0.06 252)); }
+.sec--deep > .wrap { position: relative; z-index: 1; }
+
+/* líneas de columna */
+.hero::before, .page-hero::before, .cta::before, .sec--deep::before, .sec--surface::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  --c: rgba(255,255,255,.075);
+  background-image: linear-gradient(90deg, var(--c) 1px, transparent 1px);
+  background-size: calc(var(--cols) / 6) 100%;
+  background-position: calc((100% - var(--cols)) / 2) 0;
+  mask: linear-gradient(180deg, transparent, #000 12%, #000 88%, transparent);
+}
+.sec--surface { position: relative; isolation: isolate; }
+.sec--surface::before { --c: oklch(0.23 0.035 252 / .055); }
+.sec--surface > .wrap { position: relative; z-index: 1; }
+@media (max-width: 759px) { .hero::before, .page-hero::before, .cta::before, .sec--deep::before, .sec--surface::before { background-size: calc(100vw / 3) 100%; background-position: 0 0; } }
+
+/* espacio para video / imagen de fondo */
+.bg-media { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.bg-media img, .bg-media video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1.4s var(--ease-q); }
+.bg-media.is-ready img, .bg-media.is-ready video { opacity: 1; }
+.bg-media.has-media::after { content: ""; position: absolute; inset: 0; background:
+  linear-gradient(90deg, var(--shade, oklch(0.45 0.11 252 / .92)) 0%, var(--shade, oklch(0.45 0.11 252 / .78)) 45%, oklch(0.45 0.11 252 / .35) 100%),
+  linear-gradient(0deg, oklch(0.3 0.08 252 / .45), transparent 40%); }
+.sec--deep .bg-media.has-media::after { background: linear-gradient(180deg, oklch(0.24 0.05 254 / .88), oklch(0.24 0.05 254 / .72) 50%, oklch(0.24 0.05 254 / .92)); }
+.bg-media.has-media ~ .hero__fig, .bg-media.has-media ~ .page-hero__fig, .bg-media.has-media ~ .cta__fig { opacity: .06; }
+.media-tag { position: absolute; right: var(--gutter); bottom: 1rem; z-index: 1; display: inline-flex; gap: .45rem; align-items: center; max-width: min(360px, calc(100% - 2 * var(--gutter)));
+  font: 500 .68rem/1.35 ui-monospace, "SFMono-Regular", Menlo, monospace; color: rgba(255,255,255,.72); padding: .35rem .6rem; border: 1px dashed rgba(255,255,255,.35); border-radius: 6px; background: rgba(0,0,0,.08); }
+.media-tag::before { content: ""; width: 7px; height: 7px; border-radius: 50%; border: 1px solid currentColor; flex: none; }
+.bg-media.has-media .media-tag { display: none; }
+.hero .media-tag { bottom: auto; top: 1rem; }
+@media (prefers-reduced-motion: reduce) { .bg-media video { display: none; } }
+.tech { background: none; }
+.tech__item { background: transparent; }
+@media (min-width: 760px) { .tech__item + .tech__item { border-left: 1px solid rgba(255,255,255,.1); } .tech__item:nth-child(3) { border-left: 0; } }
+@media (min-width: 1100px) { .tech__item:nth-child(3) { border-left: 1px solid rgba(255,255,255,.1); } }
+@media (max-width: 759px) { .tech__item + .tech__item { border-top: 1px solid rgba(255,255,255,.1); } }

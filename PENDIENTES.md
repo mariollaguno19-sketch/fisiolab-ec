@@ -23,3 +23,17 @@ Material a pedir a Fisiolab para pasar de prototipo a producción. Cada ítem ap
 | `{{CALENDARIO_EDUSALUD}}` | Cursos y fechas vigentes | /profesionales |
 | `{{GA4_ID}}` / `{{PIXEL_ID}}` | IDs de Google Analytics 4 y Meta Pixel (o acceso para crearlos) | js/main.js → ANALYTICS |
 | `{{HERRAMIENTAS_MEDICION}}` | Confirmar herramientas para el aviso de privacidad | /privacidad |
+
+## Fondos de video e imagen (opcionales)
+
+Se activan en `js/main.js` → `CONFIG.media`. Sin archivo, la sección muestra su degradado y una etiqueta discreta.
+
+| Espacio | Material | Formato |
+|---|---|---|
+| `{{VIDEO_HERO}}` | Recorrido corto por el centro (recepción → consultorio → sala de terapia) | .mp4 1920×1080, 10–15 s, sin audio, < 4 MB + foto .jpg de respaldo |
+| `{{VIDEO_ROBOTICA}}` | Equipos de terapia robótica en uso, sin rostros de pacientes | .mp4 igual que arriba |
+| `{{FOTO_CTA}}` | Recepción o fachada | .jpg 1920 px de ancho |
+| `{{FOTO_HOME}}` | Atención a domicilio, con autorización escrita del paciente | .jpg 1920 px |
+| `{{FOTO_ESPECIALIDADES}}` `{{FOTO_TERAPIAS}}` `{{FOTO_SERVICIOS}}` `{{FOTO_EQUIPO_GRUPAL}}` `{{FOTO_FACHADA}}` `{{FOTO_EDUSALUD}}` | Una foto horizontal por página interna | .jpg 1920 px |
+
+En celular el video no se carga (se usa la foto de respaldo) para cuidar datos y velocidad.

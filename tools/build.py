@@ -258,12 +258,13 @@ def page(name, active, title, desc, path, main, extra_head=""):
     (ROOT / name).write_text(html, encoding="utf-8")
 
 
-def page_hero(crumb, h1, lead, sub=None):
+def page_hero(crumb, key, h1, lead, sub=None):
     s = ""
     if sub:
         s = '<nav class="subnav" aria-label="En esta página">' + "".join(f'<a href="#{a}">{t}</a>' for a, t in sub) + "</nav>"
     return f'''
 <section class="page-hero">
+  {media(key) if key else ""}
   <img class="page-hero__fig" src="/assets/icon-white-lg.png" width="594" height="1000" alt="" loading="lazy">
   <div class="wrap">
     <p class="crumbs"><a href="/">Inicio</a> / {crumb}</p>
@@ -277,6 +278,7 @@ def page_hero(crumb, h1, lead, sub=None):
 def cta_final(h="Escríbenos y <em>coordinamos tu cita.</em>", p="Eliges el servicio, te respondemos por WhatsApp y confirmamos día y hora. Sin formularios."):
     return f'''
 <section class="cta">
+  {media("cta")}
   <img class="cta__fig" src="/assets/icon-white-lg.png" width="594" height="1000" alt="" loading="lazy">
   <div class="wrap">
     <h2 class="reveal">{h}</h2>
@@ -315,6 +317,25 @@ ART = {
   <path class="draw" d="M74 30 Q88 50 74 70"/><path class="draw" d="M92 20 Q112 50 92 80"/><path class="draw" d="M110 10 Q136 50 110 90"/>
 </svg>''',
 }
+
+
+MEDIA_SPEC = {
+    "hero": ("VIDEO_HERO", "video de fondo 1920×1080, 10–15 s, sin audio"),
+    "robotica": ("VIDEO_ROBOTICA", "video de fondo de los equipos en uso"),
+    "cta": ("FOTO_CTA", "foto de fondo: recepción o fachada"),
+    "home": ("FOTO_HOME", "foto de fondo: atención a domicilio"),
+    "especialidades": ("FOTO_ESPECIALIDADES", "foto de fondo: consultorio"),
+    "terapias": ("FOTO_TERAPIAS", "foto de fondo: sala de terapia"),
+    "servicios": ("FOTO_SERVICIOS", "foto de fondo: evaluación o unidad"),
+    "equipo": ("FOTO_EQUIPO_GRUPAL", "foto de fondo: el equipo completo"),
+    "ubicacion": ("FOTO_FACHADA", "foto de fondo: fachada del centro"),
+    "profesionales": ("FOTO_EDUSALUD", "foto de fondo: taller o curso"),
+}
+
+
+def media(key):
+    tag, txt = MEDIA_SPEC.get(key, ("FOTO_FONDO", "foto de fondo"))
+    return f'<div class="bg-media" data-media="{key}" aria-hidden="true"><span class="media-tag">{{{{{tag}}}}} · {txt}</span></div>'
 
 
 def tech_block():
@@ -472,6 +493,7 @@ def build_index():
 
     main = f'''
 <section class="hero" id="inicio">
+  {media("hero")}
   <svg class="hero__rings" viewBox="0 0 1000 1000" aria-hidden="true"><circle cx="500" cy="500" r="200"/><circle cx="500" cy="500" r="320"/><circle cx="500" cy="500" r="440"/></svg>
   <img class="hero__fig" src="/assets/icon-white-lg.png" width="594" height="1000" alt="">
   <div class="wrap">
@@ -529,6 +551,7 @@ def build_index():
 </section>
 
 <section class="sec sec--deep" id="robotica">
+  {media("robotica")}
   <div class="wrap">
     <div class="sec-head">
       <h2 class="h-xl reveal">Cuatro equipos de terapia robótica, <em>dentro de tu plan.</em></h2>
@@ -591,7 +614,7 @@ def build_especialidades():
           </div>
         </div></div>
       </div>'''
-    main = page_hero("Especialidades", "Doce especialidades, <em>un solo centro.</em>",
+    main = page_hero("Especialidades", "especialidades", "Doce especialidades, <em>un solo centro.</em>",
                      "Abre cada una para ver qué atiende y qué incluye. El botón de cada especialidad abre WhatsApp con ella ya escrita.") + f'''
 <section class="sec" aria-labelledby="lista-esp">
   <div class="wrap">
@@ -618,7 +641,7 @@ def build_especialidades():
 
 def build_terapias():
     physio = "".join(f'<div><dt>Fisioterapia {t.lower()}</dt><dd>{d}</dd></div>' for t, d in PHYSIO)
-    main = page_hero("Terapias", "Rehabilitación con plan <em>y tecnología.</em>",
+    main = page_hero("Terapias", "terapias", "Rehabilitación con plan <em>y tecnología.</em>",
                      "Siete líneas de fisioterapia y cuatro equipos de terapia robótica. Todo empieza con una evaluación del fisioterapeuta.",
                      [("fisioterapia", "Fisioterapia avanzada"), ("robotica", "Terapia robótica"), ("como-funciona", "Cómo empezar")]) + f'''
 <section class="sec" id="fisioterapia">
@@ -635,6 +658,7 @@ def build_terapias():
 </section>
 
 <section class="sec sec--deep" id="robotica">
+  {media("robotica")}
   <div class="wrap">
     <div class="sec-head">
       <h2 class="h-xl reveal">Terapia robótica, <em>dentro del plan.</em></h2>
@@ -670,7 +694,7 @@ def build_servicios():
     pk = "".join(f'''<div class="pkg reveal" data-d="{i}">{ph("PAQUETES_MEFCARE")}
         <h3>{n}</h3><p class="muted small" style="margin:0">Servicios incluidos, número de consultas o sesiones.</p><p class="pkg__price">Precio o “consultar”</p>
         <div>{wa_btn("mefcare", "Consultar", "btn btn--sm", "mefcare")}</div></div>''' for i, n in enumerate(["Nombre del paquete", "Nombre del paquete", "Nombre del paquete"]))
-    main = page_hero("Servicios", "Cada servicio <em>con su canal.</em>",
+    main = page_hero("Servicios", "servicios", "Cada servicio <em>con su canal.</em>",
                      "Paquetes de atención, análisis de pisada, nutrición, laboratorio, fisiorespiratoria y atención a domicilio.",
                      [("mefcare", "MEFCare"), ("pisada", "Marcha y pisada"), ("unidades", "Nutrición, laboratorio, respiratoria"), ("home", "Fisiolab Home")]) + f'''
 <section class="sec" id="mefcare">
@@ -717,6 +741,7 @@ def build_servicios():
 </section>
 
 <section class="sec sec--deep" id="home">
+  {media("home")}
   <div class="wrap split">
     <div>
       <h2 class="h-xl reveal">Si te cuesta venir, <em>vamos a tu casa.</em></h2>
@@ -741,7 +766,7 @@ def build_equipo():
     gal = [("Fachada", "Entrada por la Matilde Albán", "g-a"), ("Recepción", "Llegada y espera", ""), ("Consultorio", "Consulta de especialidad", ""),
            ("Terapia robótica", "Tecar, SIS, tracción, ondas de choque", "g-d"), ("Rayos X", "Sala de imagen", ""), ("Sala de terapia", "Camillas y gimnasio", "")]
     g = "".join(photo(t, s, "FOTOS_INSTALACIONES", c + " reveal") for t, s, c in gal)
-    main = page_hero("Equipo", "Quién te atiende <em>y dónde.</em>",
+    main = page_hero("Equipo", "equipo", "Quién te atiende <em>y dónde.</em>",
                      "El equipo médico con especialidad y registro SENESCYT, y el centro tal como es.",
                      [("equipo", "Equipo médico"), ("instalaciones", "Instalaciones")]) + f'''
 <section class="sec" id="equipo">
@@ -783,7 +808,7 @@ def build_ubicacion():
               "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer",
                               "text": re.sub(r"<[^>]+>", "", a).replace("{{CONFIRMAR_REFERENCIA}}", "").strip()}} for q, a in FAQ[:4]]}
     ld = '<script type="application/ld+json">' + json.dumps(faq_ld, ensure_ascii=False) + "</script>\n"
-    main = page_hero("Ubicación", "A dos cuadras del <em>Centro de Salud Conocoto.</em>",
+    main = page_hero("Ubicación", "ubicacion", "A dos cuadras del <em>Centro de Salud Conocoto.</em>",
                      "Matilde Albán E2-47 y Sucre, Conocoto, Valle de los Chillos, Quito.",
                      [("como-llegar", "Cómo llegar"), ("preguntas", "Preguntas frecuentes")]) + f'''
 <section class="sec" id="como-llegar">
@@ -825,7 +850,7 @@ def build_ubicacion():
 
 
 def build_profesionales():
-    main = page_hero("Profesionales", "Cursos y talleres para <em>profesionales de la salud.</em>",
+    main = page_hero("Profesionales", "profesionales", "Cursos y talleres para <em>profesionales de la salud.</em>",
                      "Formación continua del equipo de Fisiolab Edusalud. Si eres paciente, vuelve al <a href=\"/\">inicio</a>.") + f'''
 <section class="sec">
   <div class="wrap split">
@@ -844,7 +869,7 @@ def build_profesionales():
 
 
 def build_privacidad():
-    main = page_hero("Privacidad", "Aviso de <em>privacidad.</em>",
+    main = page_hero("Privacidad", None, "Aviso de <em>privacidad.</em>",
                      "Borrador base según la Ley Orgánica de Protección de Datos Personales (LOPDP). Debe revisarlo el asesor legal del centro antes de publicar.") + f'''
 <section class="sec">
   <div class="wrap legal">
@@ -870,7 +895,7 @@ def build_privacidad():
 
 
 def build_404():
-    main = page_hero("404", "Esta página <em>ya no existe.</em>",
+    main = page_hero("404", None, "Esta página <em>ya no existe.</em>",
                      'La web de Fisiolab se renovó. Busca tu servicio en el <a href="/">inicio</a> o escríbenos por WhatsApp.')
     page("404.html", "404", "Página no encontrada | Fisiolab.Ec", "La página que buscas no existe.", "/404", main)
 
