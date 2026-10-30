@@ -1,0 +1,26 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/index.php/la-clinica/:p*", "destination": "/#clinica", "permanent": true },
+    { "source": "/index.php/especialidades/:p*", "destination": "/especialidades", "permanent": true },
+    { "source": "/index.php/especialidades-medicas/:p*", "destination": "/especialidades", "permanent": true },
+    { "source": "/index.php/fisioterapia-avanzada/:p*", "destination": "/terapias#fisioterapia", "permanent": true },
+    { "source": "/index.php/terapia-robotica-2/:p*", "destination": "/terapias#robotica", "permanent": true },
+    { "source": "/index.php/evaluacion-de-la-marcha-y-pisada/:p*", "destination": "/servicios#pisada", "permanent": true },
+    { "source": "/index.php/fisiolab-ec-home/:p*", "destination": "/servicios#home", "permanent": true },
+    { "source": "/index.php/contactos/:p*", "destination": "/ubicacion", "permanent": true },
+    { "source": "/index.php/blog/:p*", "destination": "/", "permanent": true },
+    { "source": "/index.php/:p*", "destination": "/", "permanent": true },
+    { "source": "/contacto", "destination": "/ubicacion", "permanent": true }
+  ],
+  "headers": [
+    { "source": "/assets/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] },
+    { "source": "/(css|js)/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }] },
+    { "source": "/(.*)", "headers": [
+      { "key": "X-Content-Type-Options", "value": "nosniff" },
+      { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+      { "key": "X-Frame-Options", "value": "SAMEORIGIN" }
+    ] }
+  ]
+}
