@@ -85,7 +85,11 @@ def head(title, desc, path, extra=""):
 <meta property="og:description" content="{desc}">
 <meta property="og:url" content="{url}">
 <meta property="og:image" content="{BASE}/assets/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Fisiolab.Ec: consulta, imagen y rehabilitación bajo el mismo techo, en Conocoto.">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{BASE}/assets/og.jpg">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
