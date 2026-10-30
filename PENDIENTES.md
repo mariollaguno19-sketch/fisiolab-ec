@@ -37,3 +37,15 @@ Se activan en `js/main.js` → `CONFIG.media`. Sin archivo, la sección muestra 
 | `{{FOTO_ESPECIALIDADES}}` `{{FOTO_TERAPIAS}}` `{{FOTO_SERVICIOS}}` `{{FOTO_EQUIPO_GRUPAL}}` `{{FOTO_FACHADA}}` `{{FOTO_EDUSALUD}}` | Una foto horizontal por página interna | .jpg 1920 px |
 
 En celular el video no se carga (se usa la foto de respaldo) para cuidar datos y velocidad.
+
+## Formulario de orientación (captación con puntaje)
+
+| Pendiente | Qué hacer |
+|---|---|
+| `LEAD_WEBHOOK_URL` | Variable de entorno en Vercel (Settings → Environment Variables). URL de Google Apps Script, Make, Zapier o ManyChat que recibe cada contacto en JSON. Sin ella, los contactos solo quedan en los logs de Vercel. |
+| `{{VIDEO_EXPLICATIVO}}` | Video de ~2 min del equipo explicando evaluación, plan y seguimiento, sin promesas de resultado. YouTube (URL embed) o .mp4 en `CONFIG.lead.video`. |
+| `{{HORARIOS}}` en `CONFIG.lead.callHours` | Texto del horario en que se devuelven las llamadas. |
+| `{{PLAZO_CONSERVACION}}` | Confirmar con el asesor legal cuánto tiempo se guardan los datos (borrador: 12 meses). |
+| Responsable de llamadas | Quién llama a los contactos "llamada" y en qué plazo. Sin esto el formulario promete algo que nadie cumple. |
+
+Puntaje: motivo (0–2) + frustración (0–2) + cuándo empezar (0–3). 5 o más → llamada · 3–4 → consulta de evaluación · 0–2 → video.

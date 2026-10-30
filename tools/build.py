@@ -130,7 +130,7 @@ def header(active):
   </div>
 </header>
 <div class="drawer" id="drawer">
-  <a href="/">Inicio</a>{dlinks}<a href="/profesionales">Profesionales</a>
+  <a href="/">Inicio</a><a href="/#orientacion">Orientación de 1 minuto</a>{dlinks}<a href="/profesionales">Profesionales</a>
   {agendar_btn("", "Agendar por WhatsApp", "btn btn--block")}
   <p class="drawer__meta">Matilde Albán E2-47 y Sucre, Conocoto<br><a href="#" data-tel data-tel-label>02-2070188</a></p>
 </div>'''
@@ -460,6 +460,88 @@ def directory():
     return f'<div class="dir">{out}</div>'
 
 
+QUIZ = [
+    ("motivo", "¿Qué te trae a Fisiolab?", "Elige la opción que más se parece a tu caso.", [
+        ("dolor", 2, "Un dolor o molestia que no se va"),
+        ("lesion", 2, "Recuperarme de una lesión o cirugía"),
+        ("familiar", 2, "Un familiar que necesita atención"),
+        ("prevenir", 1, "Prevenir o hacerme un chequeo"),
+        ("averiguo", 0, "Solo estoy averiguando"),
+    ]),
+    ("frustracion", "¿Qué ha sido lo más frustrante hasta ahora?", "Nos ayuda a saber por dónde empezar contigo.", [
+        ("sigo_igual", 2, "Fui a varios lugares y sigo igual"),
+        ("especialista", 1, "No sé a qué especialista ir"),
+        ("moverme", 1, "Me cuesta moverme para ir a citas"),
+        ("tiempo", 1, "No encuentro tiempo ni turnos"),
+        ("empiezo", 0, "Todavía nada, recién empiezo a buscar"),
+    ]),
+    ("inicio", "¿Cuándo te gustaría empezar?", "Sin compromiso: solo para saber cómo ayudarte.", [
+        ("semana", 3, "Esta semana"),
+        ("mes", 2, "Este mes"),
+        ("adelante", 1, "Más adelante"),
+        ("info", 0, "Solo quiero información"),
+    ]),
+]
+
+
+def orientation():
+    qs = ""
+    for key, title, hint, opts in QUIZ:
+        o = "".join(f'<button type="button" class="qopt" role="radio" aria-checked="false" data-v="{v}" data-s="{sc}">{t}</button>' for v, sc, t in opts)
+        qs += f'''
+      <div class="quiz__step" data-q="{key}">
+        <h3>{title}</h3><p class="hint">{hint}</p>
+        <div class="qopts" role="radiogroup" aria-label="{title}">{o}</div>
+      </div>'''
+    return f'''
+<section class="sec sec--surface" id="orientacion">
+  <div class="wrap split">
+    <div class="orient__aside">
+      <h2 class="h-xl reveal">¿Qué te está frenando? <em>Te decimos por dónde empezar.</em></h2>
+      <p class="muted reveal" data-d="1" style="max-width:42ch;margin:0">Si no sabes qué especialista te toca o ya probaste y sigues igual, cuéntanos en un minuto. Según tus respuestas te llamamos, te proponemos una consulta o te mostramos cómo trabajamos.</p>
+      <ul class="reveal" data-d="2">
+        <li><span class="ic">1</span><span><b>Cuatro preguntas</b>Menos de un minuto, desde el celular.</span></li>
+        <li><span class="ic">2</span><span><b>Una respuesta a tu medida</b>Llamada, consulta de evaluación o un video corto.</span></li>
+        <li><span class="ic">3</span><span><b>Sin datos médicos</b>No pedimos diagnósticos ni síntomas por aquí.</span></li>
+      </ul>
+    </div>
+    <div class="quiz reveal" id="quiz" data-d="1">
+      <div class="quiz__top"><span data-count>1 de 4</span><div class="quiz__bar"><i></i></div><button type="button" class="quiz__back" hidden>← Atrás</button></div>{qs}
+      <div class="quiz__step" data-q="datos">
+        <form novalidate>
+          <h3>¿A quién contactamos?</h3><p class="hint">Solo para darte tu resultado y coordinar contigo.</p>
+          <div class="field"><label for="q-nombre">Nombre</label><input id="q-nombre" name="nombre" autocomplete="name" required><span class="err">Escribe tu nombre.</span></div>
+          <div class="field"><label for="q-cel">Celular</label><input id="q-cel" name="celular" type="tel" inputmode="tel" autocomplete="tel" placeholder="09..." required><span class="help">Te contactamos solo por tu consulta.</span><span class="err">Revisa el número: 10 dígitos, empieza con 09.</span></div>
+          <div class="hp" aria-hidden="true"><label>Empresa <input name="empresa" tabindex="-1" autocomplete="off"></label></div>
+          <label class="consent"><input type="checkbox" name="consentimiento" required><span>Acepto que Fisiolab use mis datos y respuestas para contactarme sobre esta consulta, según el <a href="/privacidad">aviso de privacidad</a>. Puedo pedir que los eliminen cuando quiera.</span></label>
+          <button class="btn btn--block" type="submit">Ver mi resultado</button>
+        </form>
+      </div>
+      <div class="quiz__step result" data-result="llamada">
+        <span class="result__badge">Te llamamos</span>
+        <h3><span data-name></span>, un asesor te va a llamar.</h3>
+        <p>Te llamaremos al <b data-cel></b> <span data-hours></span>. En la llamada revisamos qué servicio te conviene y te damos el primer turno disponible.</p>
+        <a class="btn btn--block" href="#" data-lead-wa>{WA}<span>Prefiero escribir por WhatsApp</span></a>
+      </div>
+      <div class="quiz__step result" data-result="consulta">
+        <span class="result__badge">Consulta de evaluación</span>
+        <h3><span data-name></span>, lo mejor es empezar por una evaluación.</h3>
+        <p>El especialista revisa tu caso en persona y te explica las opciones, sin compromiso de seguir un tratamiento.</p>
+        <a class="btn btn--block" href="#" data-lead-wa>{WA}<span>Agendar mi evaluación</span></a>
+        <p class="small" style="margin-top:1rem">O llámanos al <a href="#" data-tel data-tel-label>02-2070188</a>.</p>
+      </div>
+      <div class="quiz__step result" data-result="video">
+        <span class="result__badge">Conoce cómo trabajamos</span>
+        <h3><span data-name></span>, primero mira cómo trabajamos.</h3>
+        <div class="video"><span class="tag">{{{{VIDEO_EXPLICATIVO}}}}</span><div><div class="video__play"></div><span class="small">Video de 2 minutos: evaluación, plan y seguimiento en Fisiolab.</span></div></div>
+        <p>Cuando quieras dar el siguiente paso, escríbenos y te orientamos.</p>
+        <a class="link" href="#" data-lead-wa>Escribir por WhatsApp</a>
+      </div>
+    </div>
+  </div>
+</section>'''
+
+
 def build_index():
     team = "".join(
         f'<div class="doc reveal" data-d="{i}">{photo("Retrato pendiente", "Fondo neutro, luz natural", "EQUIPO")}<h3>Nombre del especialista</h3><p>Especialidad · Reg. SENESCYT</p>{ph("REGISTRO_SENESCYT")}</div>'
@@ -500,7 +582,7 @@ def build_index():
     <div class="hero__grid">
       <div>
         <h1><span class="ln"><span>Consulta, imagen</span></span><span class="ln"><span>y rehabilitación</span></span><span class="ln"><span><em>bajo el mismo techo.</em></span></span></h1>
-        <p class="hero__lede">Especialistas, Rayos X, fisioterapia y terapia robótica en Conocoto. Eliges el servicio y coordinamos tu cita por WhatsApp.</p>
+        <p class="hero__lede">Especialistas, Rayos X y programas de rehabilitación especializada con terapia robótica, en Conocoto. Eliges el servicio y coordinamos tu cita por WhatsApp.</p>
         <div class="hero__actions">
           {agendar_btn("", "Agendar por WhatsApp", "btn btn--on-brand")}
           <a class="link" href="#servicios">Ver todos los servicios</a>
@@ -510,6 +592,7 @@ def build_index():
         <h2>¿Qué necesitas hoy?</h2>
         <p>Toca una opción y te dejamos el mensaje listo.</p>
         <div class="finder__opts">{fopts}</div>
+        <a class="link small" href="#orientacion" style="margin-top:1rem">¿Prefieres que te llamemos? Haz la orientación de 1 minuto</a>
       </div>
     </div>
     <div class="proof">
@@ -521,6 +604,7 @@ def build_index():
     </div>
   </div>
 </section>
+{orientation()}
 
 <section class="sec" id="servicios">
   <div class="wrap">
@@ -554,8 +638,8 @@ def build_index():
   {media("robotica")}
   <div class="wrap">
     <div class="sec-head">
-      <h2 class="h-xl reveal">Cuatro equipos de terapia robótica, <em>dentro de tu plan.</em></h2>
-      <p class="reveal" data-d="1">No son sesiones sueltas: el fisioterapeuta decide cuál usar, cuántas sesiones y con qué intensidad, y te lo explica antes de empezar. <a class="link" style="color:#fff" href="/terapias#robotica">Conocer cada equipo</a></p>
+      <h2 class="h-xl reveal">Rehabilitación especializada <em>con terapia robótica.</em></h2>
+      <p class="reveal" data-d="1">Cuatro equipos que el fisioterapeuta integra a tu programa de rehabilitación: decide cuál usar, cuántas sesiones y con qué intensidad, y te lo explica antes de empezar. <a class="link" style="color:#fff" href="/terapias#robotica">Conocer cada equipo</a></p>
     </div>
     {tech_block()}
   </div>
@@ -877,9 +961,11 @@ def build_privacidad():
     <h2>Responsable</h2>
     <p>Fisiolab.Ec &amp; MEF Care, Matilde Albán E2-47 y Sucre, Conocoto, Quito. Contacto: <a href="#" data-mail>fisio.lab@hotmail.com</a>. Razón social y RUC: {ph("RAZON_SOCIAL_RUC")}</p>
     <h2>Qué datos recibimos</h2>
-    <p>Este sitio no tiene formularios. Cuando nos escribes por WhatsApp recibimos tu número, tu nombre de perfil y el mensaje que envías. El mensaje prellenado solo indica el servicio que te interesa; no pide datos de salud.</p>
+    <p>En el formulario de orientación recibimos tu nombre, tu celular y tus respuestas (motivo de consulta general, qué te ha frustrado y cuándo quieres empezar), solo si marcas la casilla de consentimiento. No pedimos diagnósticos ni síntomas. Cuando nos escribes por WhatsApp recibimos tu número, tu nombre de perfil y el mensaje que envías.</p>
+    <h2>Cuánto tiempo los guardamos</h2>
+    <p>Mientras dure la gestión de tu consulta y hasta 12 meses después, salvo que pidas antes que los eliminemos. {ph("PLAZO_CONSERVACION")}</p>
     <h2>Para qué los usamos</h2>
-    <p>Para responder tu consulta, coordinar tu cita y darte seguimiento sobre esa solicitud. No vendemos ni cedemos tus datos a terceros con fines comerciales.</p>
+    <p>Para responder tu consulta, llamarte o escribirte, coordinar tu cita y darte seguimiento sobre esa solicitud. No vendemos ni cedemos tus datos a terceros con fines comerciales. Los proveedores que usamos para recibir los datos los tratan solo por encargo de Fisiolab.</p>
     <h2>Datos de salud</h2>
     <p>Los datos de salud son datos sensibles según la LOPDP. Se registran solo en tu historia clínica, dentro del centro, y no se solicitan por redes sociales ni por este sitio.</p>
     <h2>Mensajes de seguimiento</h2>

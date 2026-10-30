@@ -23,6 +23,12 @@ const CONFIG = {
     facebook: "https://www.facebook.com/fisiolab.ec",
     tiktok: "https://www.tiktok.com/@fisiolab.ec"
   },
+  // Formulario de orientación. endpoint recibe los datos (api/lead.js los reenvía a LEAD_WEBHOOK_URL).
+  lead: {
+    endpoint: "/api/lead",
+    video: "",          // {{VIDEO_EXPLICATIVO}} URL de YouTube (embed) o .mp4: qué hace la clínica, sin promesas
+    callHours: "en horario de atención"   // {{HORARIOS}}
+  },
   // Fondos de video / imagen. Dejar en "" hasta tener el material.
   // video: .mp4 1920x1080, 10-15 s, sin audio, < 4 MB. poster/image: .jpg 1920 px de ancho.
   media: {
@@ -152,7 +158,7 @@ const ANALYTICS = { ga4: "", metaPixel: "" }; // {{GA4_ID}} {{PIXEL_ID}} — se 
       const open = burger.getAttribute("aria-expanded") !== "true";
       burger.setAttribute("aria-expanded", open);
       drawer.classList.toggle("is-open", open);
-      d.body.style.overflow = open ? "hidden" : "";
+      root.classList.toggle("is-locked", open);
     });
     drawer.addEventListener("click", e => { if (e.target.closest("a")) { burger.click(); } });
   }
@@ -206,14 +212,14 @@ const ANALYTICS = { ga4: "", metaPixel: "" }; // {{GA4_ID}} {{PIXEL_ID}} — se 
     state.service = service && CONFIG.services[service] ? service : null;
     state.visit = state.when = null;
     modal.classList.add("is-open"); modal.setAttribute("aria-hidden", "false");
-    d.body.style.overflow = "hidden";
+    root.classList.add("is-locked");
     setStep(state.service ? 1 : 0);
     track("agendar_open", { service: state.service || "sin_elegir" });
     closeToast(true);
   }
   function closeModal() {
     modal.classList.remove("is-open"); modal.setAttribute("aria-hidden", "true");
-    d.body.style.overflow = "";
+    root.classList.remove("is-locked");
     lastFocus && lastFocus.focus && lastFocus.focus();
   }
   function finish() {
@@ -291,6 +297,91 @@ const ANALYTICS = { ga4: "", metaPixel: "" }; // {{GA4_ID}} {{PIXEL_ID}} — se 
       i.onload = ready; i.src = m.image || m.poster; box.appendChild(i);
     }
   });
+
+  /* ---------- Orientación: formulario con puntaje ----------
+     Cada respuesta suma puntos. 5 o más: le llamamos. 3 o 4: le proponemos consulta.
+     Menos de 3: ve un video de cómo trabaja la clínica. Nunca se piden síntomas ni diagnósticos. */
+  // Guardar UTM de la primera visita para saber de dónde vino el contacto
+  try {
+    const q = new URLSearchParams(location.search), utm = {};
+    ["utm_source", "utm_medium", "utm_campaign", "utm_content"].forEach(k => { if (q.get(k)) utm[k] = q.get(k); });
+    if (Object.keys(utm).length && !store.get("fl_utm")) store.set("fl_utm", JSON.stringify(utm));
+  } catch (e) {}
+
+  const quiz = d.getElementById("quiz");
+  if (quiz) {
+    const steps = [...quiz.querySelectorAll(".quiz__step")];
+    const bar = quiz.querySelector(".quiz__bar");
+    const count = quiz.querySelector("[data-count]");
+    const back = quiz.querySelector(".quiz__back");
+    const answers = {};
+    let i = 0;
+    const show = n => {
+      i = n;
+      steps.forEach((s, k) => s.classList.toggle("is-active", k === n));
+      const total = steps.filter(s => !s.dataset.result).length;
+      bar.style.setProperty("--p", Math.min(1, (n + 1) / total));
+      count.textContent = n < total ? (n + 1) + " de " + total : "Listo";
+      back.hidden = n === 0 || n >= total;
+      if (n > 0) quiz.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    };
+    quiz.querySelectorAll(".qopt").forEach(b => b.addEventListener("click", () => {
+      const q = b.closest("[data-q]");
+      q.querySelectorAll(".qopt").forEach(o => o.setAttribute("aria-checked", o === b));
+      answers[q.dataset.q] = { v: b.dataset.v, s: +b.dataset.s, label: b.textContent.trim() };
+      if (i === 0) track("orientacion_start", {});
+      setTimeout(() => show(i + 1), 260);
+    }));
+    back.addEventListener("click", () => show(Math.max(0, i - 1)));
+
+    const form = quiz.querySelector("form");
+    const field = name => form.querySelector('[name="' + name + '"]');
+    const invalid = (el, bad) => { (el.closest(".field") || el.closest(".consent")).classList.toggle("is-invalid", bad); return bad; };
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      const nombre = field("nombre").value.trim();
+      let cel = field("celular").value.replace(/\D/g, "");
+      if (cel.startsWith("593")) cel = "0" + cel.slice(3);
+      const bad = [
+        invalid(field("nombre"), nombre.length < 2),
+        invalid(field("celular"), !/^09\d{8}$/.test(cel)),
+        invalid(field("consentimiento"), !field("consentimiento").checked)
+      ].some(Boolean);
+      if (bad) { form.querySelector(".is-invalid input").focus(); return; }
+      if (field("empresa").value) return; // trampa para bots
+
+      const score = Object.values(answers).reduce((a, b) => a + b.s, 0);
+      const segment = score >= 5 ? "llamada" : score >= 3 ? "consulta" : "video";
+      const service = { dolor: "especialidades", lesion: "fisioterapia", familiar: "home", prevenir: "medicina_general", averiguo: "general" }[(answers.motivo || {}).v] || "general";
+      let utm = {}; try { utm = JSON.parse(store.get("fl_utm") || "{}"); } catch (e) {}
+      const payload = {
+        nombre, celular: cel, segmento: segment, puntaje: score, servicio_sugerido: service,
+        respuestas: Object.fromEntries(Object.entries(answers).map(([k, a]) => [k, a.label])),
+        consentimiento: true, pagina: location.pathname, utm, fecha: new Date().toISOString()
+      };
+      fetch(CONFIG.lead.endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), keepalive: true }).catch(() => {});
+      track("lead_submit", { segment, score, service });
+
+      const res = quiz.querySelector('[data-result="' + segment + '"]');
+      res.querySelectorAll("[data-name]").forEach(n => n.textContent = nombre.split(" ")[0]);
+      res.querySelectorAll("[data-cel]").forEach(n => n.textContent = cel);
+      res.querySelectorAll("[data-hours]").forEach(n => n.textContent = CONFIG.lead.callHours);
+      res.querySelectorAll("[data-lead-wa]").forEach(a => {
+        a.href = waUrl(service, "Soy " + nombre + ", completé la orientación en la web.");
+        a.target = "_blank"; a.rel = "noopener";
+      });
+      const v = res.querySelector(".video");
+      if (v && CONFIG.lead.video && !v.dataset.loaded) {
+        v.dataset.loaded = "1"; v.innerHTML = "";
+        const url = CONFIG.lead.video;
+        const el = /\.mp4($|\?)/.test(url) ? Object.assign(d.createElement("video"), { src: url, controls: true, playsInline: true })
+          : Object.assign(d.createElement("iframe"), { src: url, title: "Cómo trabaja Fisiolab", allow: "autoplay; encrypted-media; picture-in-picture", allowFullscreen: true, loading: "lazy" });
+        v.appendChild(el);
+      }
+      show(steps.indexOf(res));
+    });
+    show(0);
+  }
 
   /* ---------- Año ---------- */
   d.querySelectorAll("[data-year]").forEach(e => e.textContent = new Date().getFullYear());
