@@ -762,3 +762,26 @@ a.btn[data-wa]:hover, button.btn[data-agendar]:hover, a.btn[data-lead-wa]:hover 
 #orientacion, #resenas { overflow: hidden; }
 #servicios { overflow: hidden; }
 @media (max-width: 759px) { .hero .media-tag { display: none; } .quiz { scroll-margin-bottom: 96px; } }
+
+/* ---------- Paquetes MEFCare ---------- */
+.chips { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.5rem; }
+.chip { padding: .55rem 1rem; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); cursor: pointer; font-size: var(--t-s); font-weight: 500; transition: background .3s, color .3s, border-color .3s; }
+.chip:hover { border-color: var(--ink); }
+.chip.is-on { background: var(--ink); color: var(--on-brand); border-color: var(--ink); }
+.pkgs { display: grid; gap: 1rem; }
+@media (min-width: 760px) { .pkgs { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1100px) { .pkgs { grid-template-columns: repeat(3, 1fr); } }
+.pkg { position: relative; display: flex; flex-direction: column; gap: .5rem; padding: 1.75rem; border-radius: var(--r-l); background: var(--bg); box-shadow: 0 0 0 1px var(--line); transition: box-shadow .4s, transform .6s var(--ease); }
+.pkg:hover { transform: translateY(-3px); box-shadow: 0 0 0 1px var(--brand), 0 24px 48px -30px oklch(0.3 0.08 252 / .5); }
+.pkg[hidden] { display: none; }
+.pkg__cat { align-self: flex-start; font-size: var(--t-xs); font-weight: 600; color: var(--brand); padding: .25rem .6rem; border-radius: 999px; background: var(--surface); }
+.pkg h3 { font-family: var(--f-serif); font-size: var(--t-l); line-height: 1.15; letter-spacing: -.02em; margin-top: .35rem; }
+.pkg__price { font-family: var(--f-serif); font-size: 2.6rem; line-height: 1; letter-spacing: -.03em; margin: .5rem 0 0; }
+.pkg__price small { font-family: var(--f-sans); font-size: .8rem; letter-spacing: .08em; color: var(--ink-2); vertical-align: top; }
+.pkg__price--ask { font-size: 1.6rem; }
+.pkg__promo { font-size: var(--t-xs); color: var(--ink-2); margin: 0 0 .5rem; }
+.pkg__inc { font-size: var(--t-s); color: var(--ink-2); line-height: 1.5; margin: 0 0 1rem; }
+.pkg__inc b { color: var(--ink); font-weight: 500; }
+.pkg__act { margin-top: auto; display: flex; flex-wrap: wrap; gap: .5rem; }
+.btn--pay { --bg: var(--brand); }
+.btn[hidden], [hidden] { display: none !important; }

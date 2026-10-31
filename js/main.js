@@ -5,7 +5,8 @@ const CONFIG = {
   waMain: "593983966770",          // WhatsApp principal 0983966770
   waNutricion: "593999882269",     // 0999882269
   waLaboratorio: "593999887103",   // 0999887103
-  waEdusalud: "593983966770",      // {{WHATSAPP_EDUSALUD}} — confirmar número propio; hoy usa el principal
+  waEdusalud: "593983966770",
+  waMefcare: "593999887103",      // citas MEFCare 0999887103 (alterno 0999882269)      // {{WHATSAPP_EDUSALUD}} — confirmar número propio; hoy usa el principal
   phone: "022070188",
   phoneLabel: "02-2070188",
   email: "fisio.lab@hotmail.com",
@@ -24,6 +25,8 @@ const CONFIG = {
     tiktok: "https://www.tiktok.com/@fisiolab.ec"
   },
   // Formulario de orientación. endpoint recibe los datos (api/lead.js los reenvía a LEAD_WEBHOOK_URL).
+  // Enlaces de pago de cada paquete MEFCare (pasarela). Vacío = solo botón de WhatsApp.
+  pay: { hta: "", diabetes: "", gine30: "", gine45: "", prost40: "", prost50: "", prost65: "", deportivo: "" },
   lead: {
     endpoint: "/api/lead",
     video: "",          // {{VIDEO_EXPLICATIVO}} URL de YouTube (embed) o .mp4: qué hace la clínica, sin promesas
@@ -61,7 +64,7 @@ const CONFIG = {
     neurocirugia:       { label: "Neurocirugía", n: "waMain" },
     fisioterapia:       { label: "Fisioterapia", n: "waMain" },
     robotica:           { label: "Terapia robótica", n: "waMain" },
-    mefcare:            { label: "Paquetes MEFCare", n: "waMain", msg: "información de los paquetes MEFCare" },
+    mefcare:            { label: "Paquetes MEFCare", n: "waMefcare", msg: "información de los paquetes preventivos MEFCare" },
     pisada:             { label: "Evaluación de marcha y pisada", n: "waMain", msg: "agendar una evaluación de marcha y pisada" },
     nutricion:          { label: "Nutrición", n: "waNutricion" },
     fisiorespiratoria:  { label: "Fisioterapia respiratoria", n: "waMain" },
@@ -102,7 +105,7 @@ const ANALYTICS = { ga4: "", metaPixel: "" }; // {{GA4_ID}} {{PIXEL_ID}} — se 
   }
   // Enlaces directos con data-wa="servicio"
   d.querySelectorAll("[data-wa]").forEach(a => {
-    a.href = waUrl(a.dataset.wa);
+    a.href = waUrl(a.dataset.wa, a.dataset.waExtra);
     a.target = "_blank"; a.rel = "noopener";
     a.addEventListener("click", () => track("whatsapp_click", { service: a.dataset.wa, source: a.dataset.src || location.pathname }));
   });
@@ -444,6 +447,19 @@ const ANALYTICS = { ga4: "", metaPixel: "" }; // {{GA4_ID}} {{PIXEL_ID}} — se 
     });
     show(0);
   }
+
+  /* ---------- Paquetes MEFCare: filtro y pago en línea ---------- */
+  d.querySelectorAll("[data-pay]").forEach(a => {
+    const url = CONFIG.pay[a.dataset.pay];
+    if (url) { a.href = url; a.hidden = false; a.target = "_blank"; a.rel = "noopener";
+      a.addEventListener("click", () => track("pago_click", { paquete: a.dataset.pay })); }
+  });
+  d.querySelectorAll(".chips").forEach(g => g.addEventListener("click", e => {
+    const b = e.target.closest("[data-filter]"); if (!b) return;
+    g.querySelectorAll(".chip").forEach(c => c.classList.toggle("is-on", c === b));
+    const f = b.dataset.filter;
+    g.parentElement.querySelectorAll(".pkg[data-cat]").forEach(p => { p.hidden = f !== "all" && p.dataset.cat !== f; });
+  }));
 
   /* ---------- Año ---------- */
   d.querySelectorAll("[data-year]").forEach(e => e.textContent = new Date().getFullYear());

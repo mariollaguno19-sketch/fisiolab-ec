@@ -847,20 +847,67 @@ def build_terapias():
          "/terapias", main)
 
 
+# Paquetes preventivos MEFCare (precios promocionales entregados por el cliente)
+MEFCARE = [
+    ("cardiologia", "Cardiología", "Chequeo Hipertensión Arterial", "120", "hta",
+     "Chequeo de medicina clínica, electrocardiograma, laboratorio clínico (BH, HOMA-IR, TG, colesterol, creatinina, urea, EMO), InBody (composición corporal) y revisión de exámenes."),
+    ("clinica", "Medicina clínica", "Chequeo Control Diabetes", "140", "diabetes",
+     "Chequeo de medicina clínica, laboratorio clínico (BH, hemoglobina glicosilada, glucosa, colesterol, HDL, LDL, urea, creatinina, ácido úrico, EMO), electrocardiograma, InBody y revisión de exámenes."),
+    ("ginecologia", "Ginecología", "Ginecológico +30", "147", "gine30",
+     "Chequeo médico-clínico, Papanicolaou, eco transvaginal, laboratorio clínico (biometría hemática, glucosa, TG, colesterol, HDL, LDL, LH, FSH), InBody y revisión de exámenes."),
+    ("ginecologia", "Ginecología", "Ginecológico +45 Hormonal Completo", "176", "gine45",
+     "Chequeo de medicina, Papanicolaou, eco transvaginal, eco de mama, laboratorio clínico (biometría hemática, HOMA-IR, triglicéridos, colesterol, HDL, LDL, LH, FSH), InBody y revisión de exámenes."),
+    ("urologia", "Urología", "Chequeo Prostático Hombres +40", "125", "prost40",
+     "Chequeo médico-clínico, eco de próstata, laboratorio clínico (PSA total, PSA libre, biometría hemática), InBody y revisión de exámenes."),
+    ("urologia", "Urología", "Chequeo Prostático Hombres +50", "145", "prost50",
+     "Chequeo de medicina clínica, eco de próstata, laboratorio clínico (PSA total, PSA libre, biometría hemática), electrocardiograma, InBody y revisión de exámenes."),
+    ("urologia", "Urología", "Chequeo Prostático Hombres +65", "210", "prost65",
+     "Chequeo médico-clínico, eco reno-vésico-prostático, laboratorio clínico (PSA total y libre, EMO, BH, glucosa, triglicéridos, colesterol, HDL, LDL, TGO, TGP, creatinina, urea, TSH), InBody, electrocardiograma y chequeo con especialista urólogo."),
+    ("deportiva", "Deportiva", "Paquete Deportivo", "", "deportivo",
+     "Chequeo médico-clínico, laboratorio clínico (BH, hierro, urea, glucosa, creatinina, TGO, TGP, cortisol, LDH, CPK, CPK-MB, vitamina D), InBody, electrocardiograma y revisión de exámenes."),
+]
+
+
+def mefcare_block():
+    cats = []
+    for c, label, *_ in MEFCARE:
+        if (c, label) not in cats:
+            cats.append((c, label))
+    chips = '<button type="button" class="chip is-on" data-filter="all">Todos</button>' + "".join(
+        f'<button type="button" class="chip" data-filter="{c}">{l}</button>' for c, l in cats)
+    cards = ""
+    for i, (c, label, name, price, key, inc) in enumerate(MEFCARE):
+        pr = (f'<p class="pkg__price"><small>USD</small> {price}</p><p class="pkg__promo">Precio promocional</p>' if price
+              else '<p class="pkg__price pkg__price--ask">Consultar precio</p><p class="pkg__promo">Por WhatsApp</p>')
+        extra = f"Me interesa el {name}" + (f" (USD {price})." if price else ".")
+        cards += f'''
+      <article class="pkg reveal" data-cat="{c}" data-d="{i % 3}">
+        <span class="pkg__cat">{label}</span>
+        <h3>{name}</h3>
+        {pr}
+        <p class="pkg__inc"><b>Incluye:</b> {inc}</p>
+        <div class="pkg__act">
+          <a class="btn btn--sm" href="#" data-wa="mefcare" data-wa-extra="{extra}" data-src="mefcare">{WA}<span>Reservar</span></a>
+          <a class="btn btn--sm btn--pay" href="#" data-pay="{key}" hidden>Pagar en línea</a>
+        </div>
+      </article>'''
+    return f'''
+    <div class="chips reveal" role="group" aria-label="Filtrar paquetes por área">{chips}</div>
+    <div class="pkgs">{cards}
+    </div>
+    <p class="notice">Precios promocionales vigentes {ph("VIGENCIA_PROMO")}. Los resultados de laboratorio e imagen se revisan con el médico en la cita. Citas MEFCare: 0999887103 · 0999882269.</p>'''
+
+
 def build_servicios():
-    pk = "".join(f'''<div class="pkg reveal" data-d="{i}">{ph("PAQUETES_MEFCARE")}
-        <h3>{n}</h3><p class="muted small" style="margin:0">Servicios incluidos, número de consultas o sesiones.</p><p class="pkg__price">Precio o “consultar”</p>
-        <div>{wa_btn("mefcare", "Consultar", "btn btn--sm", "mefcare")}</div></div>''' for i, n in enumerate(["Nombre del paquete", "Nombre del paquete", "Nombre del paquete"]))
     main = page_hero("Servicios", "servicios", "Cada servicio <em>con su canal.</em>",
                      "Paquetes de atención, análisis de pisada, nutrición, laboratorio, fisiorespiratoria y atención a domicilio.",
                      [("mefcare", "MEFCare"), ("pisada", "Marcha y pisada"), ("unidades", "Nutrición, laboratorio, respiratoria"), ("home", "Fisiolab Home")]) + f'''
 <section class="sec" id="mefcare">
   <div class="wrap">
     <div class="sec-head">
-      <h2 class="h-xl reveal">Paquetes MEFCare, <em>con precio claro.</em></h2>
-      <p class="reveal" data-d="1">Agrupan consultas y sesiones en un solo plan, para que sepas cuánto vas a invertir antes de empezar. <a class="link" href="#" data-social="mefcare">@mefcare</a></p>
-    </div>
-    <div class="pkgs">{pk}</div>
+      <h2 class="h-xl reveal">Chequeos preventivos MEFCare, <em>con precio claro.</em></h2>
+      <p class="reveal" data-d="1">Consulta, exámenes de laboratorio, imagen y composición corporal en un solo paquete, con la revisión de resultados incluida. Sabes cuánto inviertes antes de venir. <a class="link" href="#" data-social="mefcare">@mefcare</a></p>
+    </div>{mefcare_block()}
   </div>
 </section>
 

@@ -7,7 +7,9 @@ Material a pedir a Fisiolab para pasar de prototipo a producción. Cada ítem ap
 | `{{EQUIPO}}` | Por cada profesional (6–8): foto retrato con fondo neutro, nombre completo, especialidad | /equipo, inicio |
 | `{{REGISTRO_SENESCYT}}` | Número de registro SENESCYT de cada profesional | /equipo, inicio |
 | `{{FOTOS_INSTALACIONES}}` | Fotos reales: fachada, recepción, sala de terapia, equipos de robótica, Rayos X, consultorio, evaluación de pisada, Home (con autorización del paciente) | Inicio, /equipo, /terapias, /servicios |
-| `{{PAQUETES_MEFCARE}}` | Nombre de cada paquete, qué incluye, precio o "consultar" | /servicios#mefcare |
+| `{{VIGENCIA_PROMO}}` | Fecha de vigencia de los precios promocionales MEFCare y precio del Paquete Deportivo | /servicios#mefcare |
+| Enlaces de pago MEFCare | Un link de pasarela por paquete; se pegan en `CONFIG.pay` de `js/main.js` y aparece el botón "Pagar en línea" | /servicios#mefcare |
+| Ginecología y Urología | Aparecen en los paquetes pero no en las 12 especialidades: confirmar si se agregan | /especialidades |
 | Perfil de Empresa en Google | La ficha ya está reclamada (4,6 · 51 opiniones). Pedir que agreguen a Orion como administrador; agregar el botón de sitio web; confirmar que el nombre de la ficha coincide con el letrero; aclarar si REHAB NOVA CENTER (mismo teléfono) es del grupo; cambiar la portada "regenerar tejidos y acelerar tu recuperación" (promesa de resultado) | Google Maps |
 | `{{HORARIOS}}` | Horario por día (hoy está en una imagen; Google Maps dice "cierra 8 p. m.") | /ubicacion, schema |
 | `{{FORMAS_PAGO}}` | Efectivo, tarjeta, transferencia, seguros/convenios | FAQ |
