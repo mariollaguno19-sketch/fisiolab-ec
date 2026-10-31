@@ -1,0 +1,15 @@
+# Fisiolab.Ec & MEF Care — Centro de Especialidades Médicas
+
+> Centro de especialidades médicas y rehabilitación en Conocoto, Valle de los Chillos, Quito (Ecuador), con 15 años de trayectoria. Consulta de especialidad, Rayos X digital, rehabilitación especializada con terapia robótica y atención a domicilio (Fisiolab Home). Citas por WhatsApp 0983966770.
+
+Dirección: Matilde Albán E2-47 y Sucre, Conocoto, Quito. A dos cuadras del Centro de Salud Conocoto.
+Teléfono: 02-2070188 · WhatsApp citas: 0983966770 · Nutrición: 0999882269 · Laboratorio: 0999887103
+Correo: fisio.lab@hotmail.com · Google: 4,6 con 51 opiniones
+
+## Servicios
+- [Especialidades médicas](https://fisiolab-ec.vercel.app/especialidades): traumatología, nutrición clínica y deportiva, medicina general, cardiología (electrocardiograma, Holter, ecocardiograma), dermatología, neumología, neurología, Rayos X, reumatología, deportología (prueba de esfuerzo), cirugía vascular y angiología, neurocirugía.
+- [Rehabilitación especializada y terapia robótica](https://fisiolab-ec.vercel.app/terapias): fisioterapia deportiva, traumatológica, neurológica, manual ortopédica, cardíaca, respiratoria y geriátrica; tecarterapia, Robot SIS, tracción vertebral computarizada y ondas de choque.
+- [Fisiolab Home y otros servicios](https://fisiolab-ec.vercel.app/servicios): atención a domicilio (fisioterapia, médico general, enfermería), paquetes MEFCare, evaluación de marcha y pisada, nutrición, laboratorio clínico, fisioterapia respiratoria.
+- [Equipo e instalaciones](https://fisiolab-ec.vercel.app/equipo)
+- [Ubicación, horarios y preguntas frecuentes](https://fisiolab-ec.vercel.app/ubicacion)
+- [Cursos para profesionales de la salud (Edusalud)](https://fisiolab-ec.vercel.app/profesionales)
