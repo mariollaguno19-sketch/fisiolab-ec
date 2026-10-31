@@ -42,7 +42,7 @@ En celular el video no se carga (se usa la foto de respaldo) para cuidar datos y
 
 | Pendiente | Qué hacer |
 |---|---|
-| `LEAD_WEBHOOK_URL` | Variable de entorno en Vercel (Settings → Environment Variables). URL de Google Apps Script, Make, Zapier o ManyChat que recibe cada contacto en JSON. Sin ella, los contactos solo quedan en los logs de Vercel. |
+| `LEAD_WEBHOOK_URL` | Seguir `tools/google-apps-script.gs` (5 min): crea la hoja, pega el script, publícalo y pon la URL en Vercel. Mientras no esté, el formulario pide al paciente confirmar por WhatsApp para que el contacto no se pierda. |
 | `{{VIDEO_EXPLICATIVO}}` | Video de ~2 min del equipo explicando evaluación, plan y seguimiento, sin promesas de resultado. YouTube (URL embed) o .mp4 en `CONFIG.lead.video`. |
 | `{{HORARIOS}}` en `CONFIG.lead.callHours` | Texto del horario en que se devuelven las llamadas. |
 | `{{PLAZO_CONSERVACION}}` | Confirmar con el asesor legal cuánto tiempo se guardan los datos (borrador: 12 meses). |

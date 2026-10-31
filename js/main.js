@@ -140,13 +140,39 @@ const ANALYTICS = { ga4: "", metaPixel: "" }; // {{GA4_ID}} {{PIXEL_ID}} — se 
   /* ---------- Header ---------- */
   const header = d.querySelector(".header");
   const wa = d.querySelector(".wa-float");
+  const dock = d.querySelector(".dock");
   let ticking = false;
   const hero = d.querySelector(".hero, .page-hero");
+  const exitOpen = () => { const e = d.getElementById("salida"); return e && e.classList.contains("is-open"); };
+
+  /* Índice fijo de la página: aparece al pasar la portada y marca la sección actual */
+  let pagebar = null, pageHeroEnd = Infinity;
+  const sub = d.querySelector(".page-hero .subnav");
+  if (sub) {
+    pagebar = d.createElement("nav");
+    pagebar.className = "pagebar"; pagebar.setAttribute("aria-label", "Secciones de esta página");
+    const title = (d.querySelector(".crumbs") || {}).textContent || "";
+    pagebar.innerHTML = '<div class="wrap"><span class="pagebar__here">' + title.split("/").pop().trim() + "</span>" + sub.innerHTML + "</div>";
+    d.body.appendChild(pagebar);
+    pageHeroEnd = d.querySelector(".page-hero").offsetHeight;
+    const links = [...pagebar.querySelectorAll("a")];
+    const targets = links.map(a => d.querySelector(a.getAttribute("href"))).filter(Boolean);
+    if ("IntersectionObserver" in window) {
+      const spy = new IntersectionObserver(es => es.forEach(e => {
+        if (!e.isIntersecting) return;
+        links.forEach(a => a.classList.toggle("is-current", a.getAttribute("href") === "#" + e.target.id));
+      }), { rootMargin: "-45% 0px -50% 0px" });
+      targets.forEach(t => spy.observe(t));
+    }
+  }
   function onScroll() {
     const y = scrollY;
     header && header.classList.toggle("is-scrolled", y > 8);
     if (header && hero) header.classList.toggle("header--on-brand", y < hero.offsetHeight - 40);
-    wa && wa.classList.toggle("is-visible", y > 420 || d.body.dataset.page !== "inicio");
+    const showFloat = y > 420 || d.body.dataset.page !== "inicio";
+    wa && wa.classList.toggle("is-visible", showFloat);
+    dock && dock.classList.toggle("is-visible", showFloat && !(exitOpen()));
+    pagebar && pagebar.classList.toggle("is-visible", y > pageHeroEnd);
     ticking = false;
   }
   addEventListener("scroll", () => { if (!ticking) { requestAnimationFrame(onScroll); ticking = true; } }, { passive: true });
@@ -253,27 +279,42 @@ const ANALYTICS = { ga4: "", metaPixel: "" }; // {{GA4_ID}} {{PIXEL_ID}} — se 
     });
   }
 
-  /* ---------- Toast: una vez por sesión, a los 25 s o al 55 % de scroll ---------- */
-  const toast = d.querySelector(".toast");
-  let toastShown = !!store.get("fl_toast");
-  function showToast() {
-    if (toastShown || !toast || (modal && modal.classList.contains("is-open"))) return;
-    toastShown = true; store.set("fl_toast", "1");
-    toast.classList.add("is-open"); toast.setAttribute("aria-hidden", "false");
-  }
-  function closeToast(silent) {
-    if (!toast) return;
-    toast.classList.remove("is-open"); toast.setAttribute("aria-hidden", "true");
-    if (silent) { toastShown = true; }
-  }
-  if (toast) {
-    toast.querySelector(".toast__x").addEventListener("click", () => closeToast());
-    toast.querySelector("[data-agendar]") && toast.querySelector("[data-agendar]").addEventListener("click", () => closeToast());
-    setTimeout(showToast, 25000);
-    addEventListener("scroll", function h() {
-      if (scrollY / (d.body.scrollHeight - innerHeight) > .55) { showToast(); removeEventListener("scroll", h); }
+  /* ---------- Pop-up de salida: cuando el paciente pierde el interés ----------
+     Escritorio: el cursor sale por arriba de la ventana. Celular: 35 s sin actividad,
+     o vuelve rápido hacia arriba después de haber bajado. Una vez por sesión, y nunca
+     si ya agendó, abrió WhatsApp o completó la orientación. */
+  const exitBox = d.getElementById("salida");
+  function closeToast() {} // compatibilidad con openModal
+  if (exitBox) {
+    const t0 = Date.now();
+    const blocked = () => store.get("fl_exit") || store.get("fl_lead") || store.get("fl_wa") ||
+      (modal && modal.classList.contains("is-open")) || Date.now() - t0 < 9000;
+    const openExit = why => {
+      if (blocked()) return;
+      store.set("fl_exit", "1");
+      exitBox.classList.add("is-open"); exitBox.setAttribute("aria-hidden", "false");
+      root.classList.add("is-locked");
+      exitBox.querySelector(".exit__go").focus({ preventScroll: true });
+      track("exit_popup", { why });
+    };
+    const closeExit = () => { exitBox.classList.remove("is-open"); exitBox.setAttribute("aria-hidden", "true"); root.classList.remove("is-locked"); };
+    exitBox.querySelectorAll("[data-exit-close]").forEach(b => b.addEventListener("click", closeExit));
+    exitBox.querySelectorAll("a, [data-agendar]").forEach(b => b.addEventListener("click", () => setTimeout(closeExit, 50)));
+    d.addEventListener("keydown", e => { if (e.key === "Escape" && exitBox.classList.contains("is-open")) closeExit(); });
+    d.addEventListener("mouseout", e => { if (!e.relatedTarget && e.clientY < 12) openExit("cursor"); });
+    let idle, maxY = 0, lastY = scrollY, lastT = Date.now();
+    const arm = () => { clearTimeout(idle); idle = setTimeout(() => openExit("inactivo"), 35000); };
+    ["scroll", "touchstart", "pointerdown", "keydown"].forEach(ev => addEventListener(ev, arm, { passive: true }));
+    arm();
+    addEventListener("scroll", () => {
+      const y = scrollY, now = Date.now(), H = d.body.scrollHeight - innerHeight;
+      maxY = Math.max(maxY, y);
+      // subió más de 1,2 pantallas en menos de 0,6 s tras haber pasado el 40 %
+      if (maxY > H * .4 && lastY - y > innerHeight * 1.2 && now - lastT < 600) openExit("scroll");
+      if (now - lastT > 600) { lastY = y; lastT = now; }
     }, { passive: true });
   }
+  d.addEventListener("click", e => { if (e.target.closest("[data-wa], [data-final], [data-lead-wa]")) store.set("fl_wa", "1"); });
 
   /* ---------- Fondos de video / imagen ---------- */
   const saveData = navigator.connection && navigator.connection.saveData;
@@ -323,7 +364,10 @@ const ANALYTICS = { ga4: "", metaPixel: "" }; // {{GA4_ID}} {{PIXEL_ID}} — se 
       bar.style.setProperty("--p", Math.min(1, (n + 1) / total));
       count.textContent = n < total ? (n + 1) + " de " + total : "Listo";
       back.hidden = n === 0 || n >= total;
-      if (n > 0) quiz.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+      if (n > 0) {
+        const target = steps[n].dataset.result ? steps[n] : quiz;
+        target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: steps[n].dataset.result ? "center" : "start" });
+      }
     };
     quiz.querySelectorAll(".qopt").forEach(b => b.addEventListener("click", () => {
       const q = b.closest("[data-q]");
@@ -337,7 +381,8 @@ const ANALYTICS = { ga4: "", metaPixel: "" }; // {{GA4_ID}} {{PIXEL_ID}} — se 
     const form = quiz.querySelector("form");
     const field = name => form.querySelector('[name="' + name + '"]');
     const invalid = (el, bad) => { (el.closest(".field") || el.closest(".consent")).classList.toggle("is-invalid", bad); return bad; };
-    form.addEventListener("submit", e => {
+    const submit = form.querySelector('button[type="submit"]');
+    form.addEventListener("submit", async e => {
       e.preventDefault();
       const nombre = field("nombre").value.trim();
       let cel = field("celular").value.replace(/\D/g, "");
@@ -359,16 +404,33 @@ const ANALYTICS = { ga4: "", metaPixel: "" }; // {{GA4_ID}} {{PIXEL_ID}} — se 
         respuestas: Object.fromEntries(Object.entries(answers).map(([k, a]) => [k, a.label])),
         consentimiento: true, pagina: location.pathname, utm, fecha: new Date().toISOString()
       };
-      fetch(CONFIG.lead.endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), keepalive: true }).catch(() => {});
-      track("lead_submit", { segment, score, service });
+
+      // Esperar la respuesta (máx. 6 s). Si el contacto no quedó guardado, el paciente
+      // confirma por WhatsApp y el contacto llega igual a recepción.
+      submit.disabled = true; submit.classList.add("is-loading"); submit.textContent = "Enviando…";
+      let stored = false;
+      try {
+        const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 6000);
+        const r = await fetch(CONFIG.lead.endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), signal: ctl.signal });
+        clearTimeout(t);
+        const j = await r.json().catch(() => ({}));
+        stored = !!(r.ok && j.stored);
+      } catch (err) { stored = false; }
+      submit.disabled = false; submit.classList.remove("is-loading"); submit.textContent = "Ver mi resultado";
+      store.set("fl_lead", "1");
+      track("lead_submit", { segment, score, service, stored });
 
       const res = quiz.querySelector('[data-result="' + segment + '"]');
+      res.classList.toggle("is-unsaved", !stored);
       res.querySelectorAll("[data-name]").forEach(n => n.textContent = nombre.split(" ")[0]);
       res.querySelectorAll("[data-cel]").forEach(n => n.textContent = cel);
       res.querySelectorAll("[data-hours]").forEach(n => n.textContent = CONFIG.lead.callHours);
+      const extra = segment === "llamada"
+        ? "Soy " + nombre + ", completé la orientación en la web y quiero que me llamen."
+        : "Soy " + nombre + ", completé la orientación en la web.";
       res.querySelectorAll("[data-lead-wa]").forEach(a => {
-        a.href = waUrl(service, "Soy " + nombre + ", completé la orientación en la web.");
-        a.target = "_blank"; a.rel = "noopener";
+        a.href = waUrl(service, extra); a.target = "_blank"; a.rel = "noopener";
+        a.addEventListener("click", () => track("whatsapp_click", { service, source: "orientacion_" + segment }), { once: true });
       });
       const v = res.querySelector(".video");
       if (v && CONFIG.lead.video && !v.dataset.loaded) {

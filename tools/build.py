@@ -124,7 +124,7 @@ def header(active):
       <img class="on-brand" src="/assets/icon-white-xs.png" width="20" height="34" alt="">
       <img class="on-brand brand__word" src="/assets/wordmark-white-sm.png" width="94" height="22" alt="Fisiolab.Ec">
     </a>
-    <nav class="nav" aria-label="Principal">{links}</nav>
+    <nav class="nav" aria-label="Principal">{links}<a class="nav__help" href="/#orientacion">¿No sabes por dónde empezar?</a></nav>
     {agendar_btn("", "Agendar", "btn btn--sm header__cta")}
     <button class="burger" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="drawer"><span></span></button>
   </div>
@@ -191,16 +191,29 @@ def modal():
     </div>
   </div>
 </div>
-<div class="toast" role="dialog" aria-live="polite" aria-label="Ayuda para agendar" aria-hidden="true">
-  <b>¿No sabes qué especialista te toca?</b>
-  <button type="button" class="toast__x" aria-label="Cerrar aviso">×</button>
-  <p>Cuéntanos qué buscas y te orientamos por WhatsApp.</p>
-  {agendar_btn("general", "Que me orienten", "btn btn--sm")}
+<div class="exit" id="salida" role="dialog" aria-modal="true" aria-labelledby="salida-t" aria-hidden="true">
+  <div class="exit__scrim" data-exit-close></div>
+  <div class="exit__box">
+    <button type="button" class="modal__close" data-exit-close aria-label="Cerrar">×</button>
+    <img class="exit__fig" src="/assets/icon-blue.png" width="152" height="256" alt="" loading="lazy">
+    <h2 id="salida-t">¿Te vas sin <em>resolverlo?</em></h2>
+    <p>Cuéntanos en un minuto qué te pasa y te decimos por dónde empezar: una llamada, una consulta o un video de cómo trabajamos.</p>
+    <a class="btn btn--block exit__go" href="/#orientacion">Hacer la orientación de 1 minuto</a>
+    <button type="button" class="exit__alt" data-agendar="">{WA}<span>Prefiero escribir por WhatsApp</span></button>
+    <p class="fine">Sin compromiso. No te pedimos diagnósticos.</p>
+  </div>
 </div>
-<button type="button" class="wa-float" data-agendar="" aria-label="Agendar por WhatsApp"><span class="dot" aria-hidden="true"></span>{WA}<span>Agendar</span></button>'''
+<nav class="dock" aria-label="Accesos rápidos">
+  <a href="/#servicios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span>Servicios</span></a>
+  <a href="/#orientacion"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.4M12 17h.01"/></svg><span>Orientación</span></a>
+  <button type="button" class="dock__wa" data-agendar="">{WA}<span>Agendar</span></button>
+</nav>
+<button type="button" class="wa-float" data-agendar="" aria-label="Agendar por WhatsApp"><span class="wa-float__ic">{WA}</span><span class="wa-float__txt">Agendar por WhatsApp</span></button>'''
 
 
 def footer():
+    import hashlib
+    JSV = hashlib.sha1((ROOT / "js/main.js").read_bytes()).hexdigest()[:10]
     return f'''
 <footer class="footer">
   <div class="wrap">
@@ -247,7 +260,7 @@ def footer():
     </div>
   </div>
 </footer>
-<script src="/js/main.js" defer></script>
+<script src="/js/main.js?v={JSV}" defer></script>
 </body>
 </html>'''
 
@@ -275,7 +288,7 @@ def page_hero(crumb, key, h1, lead, sub=None):
 </section>'''
 
 
-def cta_final(h="Escríbenos y <em>coordinamos tu cita.</em>", p="Eliges el servicio, te respondemos por WhatsApp y confirmamos día y hora. Sin formularios."):
+def cta_final(h="Escríbenos y <em>coordinamos tu cita.</em>", p="Eliges el servicio, te respondemos por WhatsApp y confirmamos día y hora. Si no sabes qué elegir, te orientamos."):
     return f'''
 <section class="cta">
   {media("cta")}
@@ -487,10 +500,10 @@ QUIZ = [
 
 def orientation():
     qs = ""
-    for key, title, hint, opts in QUIZ:
+    for n, (key, title, hint, opts) in enumerate(QUIZ):
         o = "".join(f'<button type="button" class="qopt" role="radio" aria-checked="false" data-v="{v}" data-s="{sc}">{t}</button>' for v, sc, t in opts)
         qs += f'''
-      <div class="quiz__step" data-q="{key}">
+      <div class="quiz__step{' is-active' if n == 0 else ''}" data-q="{key}">
         <h3>{title}</h3><p class="hint">{hint}</p>
         <div class="qopts" role="radiogroup" aria-label="{title}">{o}</div>
       </div>'''
@@ -499,7 +512,7 @@ def orientation():
   <div class="wrap split">
     <div class="orient__aside">
       <h2 class="h-xl reveal">¿Qué te está frenando? <em>Te decimos por dónde empezar.</em></h2>
-      <p class="muted reveal" data-d="1" style="max-width:42ch;margin:0">Si no sabes qué especialista te toca o ya probaste y sigues igual, cuéntanos en un minuto. Según tus respuestas te llamamos, te proponemos una consulta o te mostramos cómo trabajamos.</p>
+      <p class="muted reveal" data-d="1" style="max-width:42ch;margin:0">Si no sabes qué especialista te toca, o ya probaste y sigues igual, responde cuatro preguntas. Según tus respuestas te llamamos, te proponemos una consulta o te mostramos cómo trabajamos.</p>
       <ul class="reveal" data-d="2">
         <li><span class="ic">1</span><span><b>Cuatro preguntas</b>Menos de un minuto, desde el celular.</span></li>
         <li><span class="ic">2</span><span><b>Una respuesta a tu medida</b>Llamada, consulta de evaluación o un video corto.</span></li>
@@ -522,12 +535,14 @@ def orientation():
         <span class="result__badge">Te llamamos</span>
         <h3><span data-name></span>, un asesor te va a llamar.</h3>
         <p>Te llamaremos al <b data-cel></b> <span data-hours></span>. En la llamada revisamos qué servicio te conviene y te damos el primer turno disponible.</p>
-        <a class="btn btn--block" href="#" data-lead-wa>{WA}<span>Prefiero escribir por WhatsApp</span></a>
+        <p class="unsaved-note">Para asegurar tu llamada, envíanos tu solicitud por WhatsApp: el mensaje ya está escrito.</p>
+        <a class="btn btn--block" href="#" data-lead-wa>{WA}<span class="saved-txt">Prefiero escribir por WhatsApp</span><span class="unsaved-txt">Confirmar por WhatsApp</span></a>
       </div>
       <div class="quiz__step result" data-result="consulta">
         <span class="result__badge">Consulta de evaluación</span>
         <h3><span data-name></span>, lo mejor es empezar por una evaluación.</h3>
         <p>El especialista revisa tu caso en persona y te explica las opciones, sin compromiso de seguir un tratamiento.</p>
+        <p class="unsaved-note">Envíanos tu solicitud por WhatsApp y te damos el primer turno disponible.</p>
         <a class="btn btn--block" href="#" data-lead-wa>{WA}<span>Agendar mi evaluación</span></a>
         <p class="small" style="margin-top:1rem">O llámanos al <a href="#" data-tel data-tel-label>02-2070188</a>.</p>
       </div>
@@ -635,17 +650,17 @@ def build_index():
     <div class="hero__grid">
       <div>
         <h1><span class="ln"><span>Consulta, imagen</span></span><span class="ln"><span>y rehabilitación</span></span><span class="ln"><span><em>bajo el mismo techo.</em></span></span></h1>
-        <p class="hero__lede">Especialistas, Rayos X y programas de rehabilitación especializada con terapia robótica, en Conocoto. Eliges el servicio y coordinamos tu cita por WhatsApp.</p>
+        <p class="hero__lede">Especialistas, Rayos X, rehabilitación especializada con terapia robótica y atención en casa, en Conocoto. Dinos qué necesitas y coordinamos tu cita por WhatsApp.</p>
         <div class="hero__actions">
           {agendar_btn("", "Agendar por WhatsApp", "btn btn--on-brand")}
-          <a class="link" href="#servicios">Ver todos los servicios</a>
+          <a class="link" href="#orientacion">No sé por dónde empezar</a>
         </div>
       </div>
       <div class="finder">
         <h2>¿Qué necesitas hoy?</h2>
-        <p>Toca una opción y te dejamos el mensaje listo.</p>
+        <p>Toca una opción: se abre WhatsApp con tu mensaje listo.</p>
         <div class="finder__opts">{fopts}</div>
-        <a class="link small" href="#orientacion" style="margin-top:1rem">¿Prefieres que te llamemos? Haz la orientación de 1 minuto</a>
+        <a class="link small" href="#orientacion" style="margin-top:1rem">¿No sabes cuál elegir? Haz la orientación de 1 minuto</a>
       </div>
     </div>
     <div class="proof">
@@ -662,8 +677,8 @@ def build_index():
 <section class="sec" id="servicios">
   <div class="wrap">
     <div class="sec-head">
-      <h2 class="h-xl reveal">Todo el grupo,<br><em>en una sola puerta.</em></h2>
-      <p class="reveal" data-d="1">Antes eran siete cuentas, varios números y una web que no los unía. Aquí está cada servicio de Fisiolab, ordenado por lo que necesitas.</p>
+      <h2 class="h-xl reveal">Encuentra tu servicio <em>sin dar vueltas.</em></h2>
+      <p class="reveal" data-d="1">Todos los servicios de Fisiolab, ordenados por lo que necesitas. Toca uno para ver qué incluye, o agenda directo por WhatsApp. ¿No sabes cuál? <a class="link" href="#orientacion">Haz la orientación</a>.</p>
     </div>
     {directory()}
   </div>
