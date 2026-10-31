@@ -110,15 +110,19 @@ button { font: inherit; color: inherit; }
 }
 .no-loader .loader { display: none; }
 .loader__inner { display: grid; justify-items: center; gap: 22px; }
-.loader__fig { width: 70px; height: 118px; animation: fig-rise 1s var(--ease) .15s both, fig-stretch 1.4s var(--ease-q) 1.05s both; transform-origin: 40% 100%; }
-.loader__word { width: 168px; height: 40px; animation: word-in .9s var(--ease) .75s both; }
+.loader__fig { width: 78px; height: 131px; animation: fig-rise 1.2s var(--ease) .2s both, fig-stretch 1.3s var(--ease-q) 1.3s 2 both, fig-breathe 1.6s var(--ease-q) 3.9s both; transform-origin: 40% 100%; }
+.loader__word { width: 168px; height: 40px; animation: word-in 1s var(--ease) 1.6s both; }
 .loader__bar { width: 168px; height: 1px; background: rgba(255,255,255,.25); overflow: hidden; }
-.loader__bar i { display: block; height: 100%; background: #fff; transform-origin: left; animation: bar 2.4s var(--ease-q) .2s both; }
-.loader__note { font-size: var(--t-xs); letter-spacing: .02em; color: var(--on-brand-2); animation: word-in .9s var(--ease) 1.1s both; }
+.loader__bar i { display: block; height: 100%; background: #fff; transform-origin: left; animation: bar 4.7s cubic-bezier(.45,.05,.35,1) .2s both; }
+.loader__note { font-size: var(--t-xs); letter-spacing: .02em; color: var(--on-brand-2); animation: word-in 1s var(--ease) 2.4s both; }
+.loader__inner::after { content: ""; position: absolute; width: 260px; height: 260px; border-radius: 50%; border: 1px solid rgba(255,255,255,.18); top: 50%; left: 50%; translate: -50% -62%; animation: halo 2.6s var(--ease-q) 1.2s infinite both; pointer-events: none; opacity: 0; }
+.loader__inner { position: relative; }
+@keyframes halo { 0% { scale: .55; opacity: 0; } 30% { opacity: 1; } 100% { scale: 1.25; opacity: 0; } }
+@keyframes fig-breathe { 0% { scale: 1; } 50% { scale: 1.06; } 100% { scale: 1; } }
 .loader.is-done { transform: translateY(-100%); visibility: hidden; }
 .loader.is-done .loader__inner { transition: opacity .4s, transform 1s var(--ease); opacity: 0; transform: translateY(-40px); }
 @keyframes fig-rise { from { clip-path: inset(100% 0 0 0); transform: translateY(18px); } to { clip-path: inset(0 0 0 0); transform: none; } }
-@keyframes fig-stretch { 0% { rotate: 0deg; } 45% { rotate: -9deg; } 100% { rotate: 0deg; } }
+@keyframes fig-stretch { 0% { rotate: 0deg; } 45% { rotate: -11deg; } 100% { rotate: 0deg; } }
 @keyframes word-in { from { opacity: 0; transform: translateY(10px); filter: blur(6px); } to { opacity: 1; transform: none; filter: none; } }
 @keyframes rise { from { transform: translateY(24px); filter: blur(6px); } to { transform: none; filter: none; } }
 @keyframes bar { from { transform: scaleX(0); } to { transform: scaleX(1); } }

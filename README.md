@@ -11,7 +11,7 @@ Prototipo de renovación de fisiolab.ec por Orion AI Studio. HTML, CSS y JS sin 
 - Textos, header, footer y modal: `tools/build.py`, luego `python3 tools/build.py` para regenerar los `.html`.
 
 ## Qué incluye
-- Pantalla de carga con la figura del logo (primera vista de la sesión, mínimo 2,8 s, tope 4 s).
+- Pantalla de carga con la figura del logo (primera vista de la sesión, 5 s, tope 6 s).
 - Modal "Agendar" con pre-clasificación en 3 pasos (servicio → primera vez → urgencia) que arma el mensaje de WhatsApp.
 - Aviso emergente suave, una vez por sesión.
 - Pop-up de salida (cursor sale por arriba, 35 s sin actividad o subida rápida), una vez por sesión.

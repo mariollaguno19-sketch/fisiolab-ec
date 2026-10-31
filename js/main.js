@@ -118,14 +118,14 @@ const ANALYTICS = { ga4: "", metaPixel: "" }; // {{GA4_ID}} {{PIXEL_ID}} — se 
 
   /* ---------- Loader (primera vista de la sesión) ----------
      Secuencia: la figura se levanta, se estira, entra el wordmark y la cortina sube.
-     Dura al menos 2.8 s para que la animación se vea completa; tope duro de 4 s. */
+     Dura 5 s para que la animación del logo se vea completa; tope duro de 6 s. */
   const loader = d.querySelector(".loader");
   if (loader) {
     if (store.get("fl_seen") || reduce) { loader.remove(); }
     else {
       store.set("fl_seen", "1");
       d.body.style.overflow = "hidden";
-      const t0 = performance.now(), MIN = 2800, MAX = 4000;
+      const t0 = performance.now(), MIN = 5000, MAX = 6000;
       let closed = false;
       const done = () => {
         if (closed) return; closed = true;

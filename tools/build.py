@@ -109,7 +109,7 @@ def header(active):
     return f'''
 <div class="loader" aria-hidden="true">
   <div class="loader__inner">
-    <img class="loader__fig" src="/assets/icon-white-sm.png" width="70" height="118" alt="">
+    <img class="loader__fig" src="/assets/icon-white-sm.png" width="78" height="131" alt="">
     <img class="loader__word" src="/assets/wordmark-white-md.png" width="168" height="40" alt="">
     <div class="loader__bar"><i></i></div>
     <span class="loader__note">Centro de Especialidades Médicas · Conocoto</span>
