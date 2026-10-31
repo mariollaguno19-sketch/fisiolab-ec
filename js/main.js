@@ -9,7 +9,7 @@ const CONFIG = {
   phone: "022070188",
   phoneLabel: "02-2070188",
   email: "fisio.lab@hotmail.com",
-  maps: "https://g.co/kgs/KzDytyt",
+  maps: "https://maps.app.goo.gl/4i7tmCACJxaohSM86",
   mapsEmbed: "https://www.google.com/maps?q=Matilde+Alb%C3%A1n+E2-47+y+Sucre,+Conocoto,+Quito&output=embed",
   hub: "https://mylnker.com/grupofisiolabec",
   social: {

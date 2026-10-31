@@ -571,6 +571,30 @@ def home_feature(where):
 </section>'''
 
 
+
+# Reseñas reales de Google: texto original, ortografía corregida, recortes marcados con […].
+# Se excluyen las que hablan de resultados clínicos o comparan con otros centros.
+REVIEWS = [
+    ("Mateo Arias", "2025", "Me atendió la señorita fisioterapeuta Fernanda Villacís, excelente en el ámbito profesional, siempre muy cortés […]. Para ser la primera vez en rehabilitación física, fue un trato muy cordial de parte de la señorita. No hay nada que mejorar, excelente persona y profesional."),
+    ("Julio César Arteaga", "2025", "Cuentan con profesionales capacitados y con mucha empatía con los pacientes, además, atención oportuna y asesoría adecuada."),
+    ("Steeb Aguiar", "2024", "Excelente ubicación, excelente personal, adecuadamente equipado, horario amplio para tu comodidad, Rx disponible […]. Recomendada."),
+    ("Leonel Cuichan", "2025", "Excelente servicio y profesionales calificados, gran experiencia en mi proceso de rehabilitación, ¡recomendadísimo!"),
+    ("Liza Ibarra", "2025", "La atención, genial y muy profesional."),
+]
+
+
+def reviews():
+    out = ""
+    for i, (name, year, text) in enumerate(REVIEWS):
+        out += f'''
+      <figure class="review reveal" data-d="{i % 3}">
+        <div class="review__stars" aria-label="5 de 5 estrellas">★★★★★</div>
+        <blockquote>“{text}”</blockquote>
+        <figcaption><b>{name}</b><span>Reseña en Google · {year}</span></figcaption>
+      </figure>'''
+    return out
+
+
 def build_index():
     team = "".join(
         f'<div class="doc reveal" data-d="{i}">{photo("Retrato pendiente", "Fondo neutro, luz natural", "EQUIPO")}<h3>Nombre del especialista</h3><p>Especialidad · Reg. SENESCYT</p>{ph("REGISTRO_SENESCYT")}</div>'
@@ -592,7 +616,7 @@ def build_index():
         "address": {"@type": "PostalAddress", "streetAddress": "Matilde Albán E2-47 y Sucre", "addressLocality": "Conocoto, Quito",
                     "addressRegion": "Pichincha", "addressCountry": "EC"},
         "areaServed": ["Conocoto", "Valle de los Chillos", "Quito"],
-        "hasMap": "https://g.co/kgs/KzDytyt",
+        "hasMap": "https://maps.app.goo.gl/4i7tmCACJxaohSM86",
         "aggregateRating": {"@type": "AggregateRating", "ratingValue": "4.6", "reviewCount": "51", "bestRating": "5"},
         "medicalSpecialty": ["Orthopedic", "Cardiovascular", "Dermatology", "Pulmonary", "Neurologic", "Radiography",
                              "Rheumatologic", "PhysicalTherapy", "DietNutrition", "Surgical"],
@@ -686,13 +710,16 @@ def build_index():
 </section>
 
 <section class="sec sec--surface" id="resenas">
-  <div class="wrap rating">
-    <div class="reveal"><div class="rating__num">4,6</div><div class="rating__stars" aria-hidden="true">★★★★★</div></div>
-    <div class="reveal" data-d="1">
-      <h2 class="h-l">51 pacientes opinaron en Google.</h2>
-      <p class="muted" style="margin:1rem 0 1.5rem;max-width:46ch">Léelas directamente en Google Maps, sin filtros. {ph("RESEÑAS_GOOGLE")}</p>
-      <a class="link" href="#" data-maps>Ver opiniones en Google</a>
+  <div class="wrap">
+    <div class="rating">
+      <div class="reveal"><div class="rating__num">4,6</div><div class="rating__stars" aria-hidden="true">★★★★★</div></div>
+      <div class="reveal" data-d="1">
+        <h2 class="h-l">51 pacientes opinaron <em>en Google.</em></h2>
+        <p class="muted" style="margin:1rem 0 1.5rem;max-width:46ch">Algunas de sus palabras, tomadas de sus reseñas. Todas las opiniones están en Google Maps.</p>
+        <a class="link" href="#" data-maps>Ver las 51 opiniones en Google</a>
+      </div>
     </div>
+    <div class="reviews">{reviews()}</div>
   </div>
 </section>
 
