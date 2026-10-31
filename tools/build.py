@@ -432,7 +432,7 @@ DIRECTORY = [
         ("Laboratorio clínico", "Exámenes con atención por su propio WhatsApp.", "/servicios#laboratorio", "laboratorio"),
     ]),
     ("Rehabilitación", [
-        ("Fisioterapia avanzada", "Siete líneas, de la deportiva a la geriátrica, con evaluación al inicio.", "/terapias#fisioterapia", "fisioterapia"),
+        ("Rehabilitación especializada", "Siete programas de fisioterapia, de la deportiva a la neurológica, con evaluación al inicio.", "/terapias#fisioterapia", "fisioterapia"),
         ("Terapia robótica", "Tecarterapia, Robot SIS, tracción computarizada y ondas de choque.", "/terapias#robotica", "robotica"),
         ("Fisiorespiratoria", "Fisioterapia respiratoria para niños y adultos.", "/servicios#fisiorespiratoria", "fisiorespiratoria"),
         ("Marcha y pisada", "Análisis con sensores, plantillas y recomendación de calzado.", "/servicios#pisada", "pisada"),
@@ -440,7 +440,7 @@ DIRECTORY = [
     ("Planes y atención en casa", [
         ("Paquetes MEFCare", "Consultas y sesiones agrupadas en un solo plan.", "/servicios#mefcare", "mefcare"),
         ("Nutrición", "Clínica y deportiva, con su propio canal.", "/servicios#nutricion", "nutricion"),
-        ("Fisiolab Home", "Médico, enfermería y fisioterapia en tu casa.", "/servicios#home", "home"),
+        ("Fisiolab Home", "Rehabilitación, médico y enfermería en tu casa, si te cuesta desplazarte.", "/servicios#home", "home"),
     ]),
 ]
 
@@ -450,9 +450,10 @@ def directory():
     for gi, (g, rows) in enumerate(DIRECTORY):
         r = ""
         for name, desc, href, wa in rows:
+            star = '<span class="dest">Destacado</span>' if wa in ("fisioterapia", "robotica", "home") else ""
             r += f'''
         <li><a class="dir__row" href="{href}">
-          <span class="dir__name">{name}</span>
+          <span class="dir__name">{name}{star}</span>
           <span class="dir__desc">{desc}</span>
           <span class="dir__go"><span class="circ circ--arrow">{ARROW}</span></span>
         </a></li>'''
@@ -537,6 +538,34 @@ def orientation():
         <p>Cuando quieras dar el siguiente paso, escríbenos y te orientamos.</p>
         <a class="link" href="#" data-lead-wa>Escribir por WhatsApp</a>
       </div>
+    </div>
+  </div>
+</section>'''
+
+
+
+def home_feature(where):
+    """Bloque destacado de Fisiolab Home (inicio y terapias)."""
+    return f'''
+<section class="sec home-feat" id="fisiolab-home">
+  {media("home")}
+  <div class="wrap">
+    <div class="home-feat__grid">
+      <div>
+        <span class="dest dest--on">Servicio destacado</span>
+        <h2 class="h-xl reveal" style="margin-top:1.25rem">Fisiolab Home: <em>la rehabilitación va a tu casa.</em></h2>
+        <p class="reveal" data-d="1">Para pacientes que no pueden o no deben desplazarse: adultos mayores, personas recién operadas o con movilidad reducida. El mismo equipo de Fisiolab, con un plan y seguimiento, en tu hogar.</p>
+        <div class="hero__actions reveal" data-d="2">
+          {wa_btn("home", "Pedir atención a domicilio", "btn btn--on-brand", where)}
+          <a class="link" href="/servicios#home">Cómo funciona Home</a>
+        </div>
+      </div>
+      <ul class="home-feat__list reveal" data-d="1">
+        <li><b>Fisioterapia en casa</b><span>Rehabilitación con plan de sesiones, como en el centro.</span></li>
+        <li><b>Médico general a domicilio</b><span>Consulta y control sin salir de casa.</span></li>
+        <li><b>Enfermería</b><span>Curaciones, controles y cuidados indicados por el médico.</span></li>
+        <li><b>Coordinación con el centro</b><span>Si hace falta imagen o especialista, se agenda en Conocoto.</span></li>
+      </ul>
     </div>
   </div>
 </section>'''
@@ -644,6 +673,7 @@ def build_index():
     {tech_block()}
   </div>
 </section>
+{home_feature("inicio")}
 
 <section class="sec">
   <div class="wrap">
@@ -725,21 +755,22 @@ def build_especialidades():
 
 def build_terapias():
     physio = "".join(f'<div><dt>Fisioterapia {t.lower()}</dt><dd>{d}</dd></div>' for t, d in PHYSIO)
-    main = page_hero("Terapias", "terapias", "Rehabilitación con plan <em>y tecnología.</em>",
-                     "Siete líneas de fisioterapia y cuatro equipos de terapia robótica. Todo empieza con una evaluación del fisioterapeuta.",
-                     [("fisioterapia", "Fisioterapia avanzada"), ("robotica", "Terapia robótica"), ("como-funciona", "Cómo empezar")]) + f'''
+    main = page_hero("Terapias", "terapias", "Rehabilitación especializada <em>y robótica.</em>",
+                     "Siete programas de fisioterapia, cuatro equipos de terapia robótica y atención en casa con Fisiolab Home. Todo empieza con una evaluación del fisioterapeuta.",
+                     [("fisioterapia", "Rehabilitación especializada"), ("fisiolab-home", "Fisiolab Home"), ("robotica", "Terapia robótica"), ("como-funciona", "Cómo empezar")]) + f'''
 <section class="sec" id="fisioterapia">
   <div class="wrap split">
     <div class="sticky">
-      <h2 class="h-xl reveal">Siete líneas de <em>fisioterapia.</em></h2>
+      <h2 class="h-xl reveal">Rehabilitación especializada, <em>siete programas.</em></h2>
       <p class="muted reveal" data-d="1" style="margin:1.25rem 0 2rem;max-width:40ch">El fisioterapeuta revisa tu caso, define la línea de trabajo y te explica el plan de sesiones.</p>
       <div class="reveal" data-d="2">{wa_btn("fisioterapia", "Agendar fisioterapia", "btn", "terapias")}</div>
     </div>
     <dl class="deflist reveal">{physio}
-      <div><dt>¿Te cuesta venir?</dt><dd>Fisiolab Home lleva la fisioterapia a tu casa. <a class="link" href="/servicios#home">Ver Fisiolab Home</a></dd></div>
     </dl>
   </div>
 </section>
+
+{home_feature("terapias")}
 
 <section class="sec sec--deep" id="robotica">
   {media("robotica")}
